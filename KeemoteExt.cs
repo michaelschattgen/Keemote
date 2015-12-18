@@ -38,31 +38,20 @@ namespace Keemote
 
 		private void StartRemoteDesktopConnection(object sender, EventArgs e)
 		{
-			try
-			{
-				PwEntry entry = m_host.MainWindow.GetSelectedEntry(false);
-				ProtectedString protectedUsername = entry.Strings.Get("UserName");
-				ProtectedString protectedPassword = entry.Strings.Get("Password");
-				ProtectedString protectedUrl = entry.Strings.Get("URL");
+			PwEntry entry = m_host.MainWindow.GetSelectedEntry(false);
+			ProtectedString protectedUsername = entry.Strings.Get("UserName");
+			ProtectedString protectedPassword = entry.Strings.Get("Password");
+			ProtectedString protectedUrl = entry.Strings.Get("URL");
 
-				Process cmdKeyProcess = new Process();
-				cmdKeyProcess.StartInfo.FileName = "cmdkey.exe";
-				cmdKeyProcess.StartInfo.Arguments = $"/generic:TERMSRV/{protectedUrl.ReadString()} /user:{protectedUsername.ReadString()} /pass:{protectedPassword.ReadString()}";
-				cmdKeyProcess.Start();
+			Process cmdKeyProcess = new Process();
+			cmdKeyProcess.StartInfo.FileName = "cmdkey.exe";
+			cmdKeyProcess.StartInfo.Arguments = $"/generic:TERMSRV/{protectedUrl.ReadString()} /user:{protectedUsername.ReadString()} /pass:{protectedPassword.ReadString()}";
+			cmdKeyProcess.Start();
 
-				Process remoteDesktopProcess = new Process();
-				remoteDesktopProcess.StartInfo.FileName = "mstsc.exe";
-				remoteDesktopProcess.StartInfo.Arguments = $"/v:{protectedUrl.ReadString()}";
-				remoteDesktopProcess.Start();
-
-			}
-			catch (Exception ex)
-			{
-				using (StreamWriter w = File.AppendText("log.txt"))
-				{
-					w.Write(ex);
-				}
-			}
+			Process remoteDesktopProcess = new Process();
+			remoteDesktopProcess.StartInfo.FileName = "mstsc.exe";
+			remoteDesktopProcess.StartInfo.Arguments = $"/v:{protectedUrl.ReadString()}";
+			remoteDesktopProcess.Start();
 		}
 	}
 }
