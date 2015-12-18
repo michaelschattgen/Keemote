@@ -15,6 +15,7 @@ namespace Keemote
 	public sealed class KeemoteExt : Plugin
 	{
 		private IPluginHost pluginHost = null;
+		private ToolStripMenuItem toolstripMenuItem = null;
 
 		public override bool Initialize(IPluginHost host)
 		{
@@ -22,11 +23,13 @@ namespace Keemote
 
 			ContextMenuStrip entryMenuStrip = pluginHost.MainWindow.EntryContextMenu;
 
+			entryMenuStrip.Opened += new EventHandler(entryMenu_Opened);
+
 			var toolstripSeperator = new ToolStripSeparator();
 			entryMenuStrip.Items.Add(toolstripSeperator);
 
 			// Add Remote Desktop Connection ToolStripMenuIem
-			var toolstripMenuItem = new ToolStripMenuItem();
+			toolstripMenuItem = new ToolStripMenuItem();
 			toolstripMenuItem.Image = Properties.Resources.RemoteDesktopIcon;
 			toolstripMenuItem.Text = "Start remote desktop connection...";
 			toolstripMenuItem.Click += new EventHandler(this.StartRemoteDesktopConnection);
@@ -34,6 +37,28 @@ namespace Keemote
 
 			return true;
 		}
+
+		public override void Terminate()
+		{
+			// TODO: Remove the correct items from the contextmenu
+		}
+
+		void entryMenu_Opened(object sender, EventArgs e)
+		{
+			if (toolstripMenuItem != null && pluginHost.MainWindow.GetSelectedEntriesCount() > 0)
+			{
+				toolstripMenuItem.Enabled = true;
+			}
+			else if (toolstripMenuItem == null)
+			{
+				return;
+			}
+			else
+			{
+				toolstripMenuItem.Enabled = false;
+			}
+		}
+
 
 		private void StartRemoteDesktopConnection(object sender, EventArgs e)
 		{
