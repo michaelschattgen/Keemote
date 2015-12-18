@@ -27,7 +27,8 @@ namespace Keemote
 
 			// Add Remote Desktop Connection ToolStripMenuIem
 			var toolstripMenuItem = new ToolStripMenuItem();
-			toolstripMenuItem.Text = "Start remote desktop connection";
+			toolstripMenuItem.Image = Properties.Resources.RemoteDesktopIcon;
+			toolstripMenuItem.Text = "Start remote desktop connection...";
 			toolstripMenuItem.Click += new EventHandler(this.StartRemoteDesktopConnection);
 			entryMenuStrip.Items.Add(toolstripMenuItem);
 
