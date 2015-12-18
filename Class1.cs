@@ -1,7 +1,9 @@
 ﻿using KeePass.Plugins;
 using KeePassLib;
+using KeePassLib.Security;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -28,7 +30,7 @@ namespace Keemote
 			// Add menu item 'Do Something'
 			var toolstripMenuItem = new ToolStripMenuItem();
 			toolstripMenuItem.Text = "Start remote desktop connection";
-			toolstripMenuItem.Click += this.StartRemoteDesktopConnection;
+			toolstripMenuItem.Click += new EventHandler(this.StartRemoteDesktopConnection);
 			entryMenuStrip.Items.Add(toolstripMenuItem);
 
 			return true;
@@ -36,15 +38,31 @@ namespace Keemote
 
 		private void StartRemoteDesktopConnection(object sender, EventArgs e)
 		{
-			PwEntry entry = m_host.MainWindow.GetSelectedEntry(false);
-			entry.Strings.Get("Username");
-			entry.Strings.Get("Password");
-			entry.Strings.Get("URL");
+			try
+			{
+				PwEntry entry = m_host.MainWindow.GetSelectedEntry(false);
+				ProtectedString protectedUsername = entry.Strings.Get("UserName");
+				ProtectedString protectedPassword = entry.Strings.Get("Password");
+				ProtectedString protectedUrl = entry.Strings.Get("URL");
 
-			//using (StreamWriter w = File.AppendText("log.txt"))
-			//{
-			//	w.Write(e);
-			//}
+				Process cmdKeyProcess = new Process();
+				cmdKeyProcess.StartInfo.FileName = "cmdkey.exe";
+				cmdKeyProcess.StartInfo.Arguments = $"/generic:TERMSRV/{protectedUrl.ReadString()} /user:{protectedUsername.ReadString()} /pass:{protectedPassword.ReadString()}";
+				cmdKeyProcess.Start();
+
+				Process remoteDesktopProcess = new Process();
+				remoteDesktopProcess.StartInfo.FileName = "mstsc.exe";
+				remoteDesktopProcess.StartInfo.Arguments = $"/v:{protectedUrl.ReadString()}";
+				remoteDesktopProcess.Start();
+
+			}
+			catch (Exception ex)
+			{
+				using (StreamWriter w = File.AppendText("log.txt"))
+				{
+					w.Write(ex);
+				}
+			}
 		}
 	}
 }
