@@ -14,20 +14,18 @@ namespace Keemote
 {
 	public sealed class KeemoteExt : Plugin
 	{
-		private IPluginHost m_host = null;
+		private IPluginHost pluginHost = null;
 
 		public override bool Initialize(IPluginHost host)
 		{
-			m_host = host;
+			pluginHost = host;
 
-			// Get a reference to the 'Tools' menu item container
-			ContextMenuStrip entryMenuStrip = m_host.MainWindow.EntryContextMenu;
+			ContextMenuStrip entryMenuStrip = pluginHost.MainWindow.EntryContextMenu;
 
-			// Add a separator at the bottom
 			var toolstripSeperator = new ToolStripSeparator();
 			entryMenuStrip.Items.Add(toolstripSeperator);
 
-			// Add menu item 'Do Something'
+			// Add Remote Desktop Connection ToolStripMenuIem
 			var toolstripMenuItem = new ToolStripMenuItem();
 			toolstripMenuItem.Text = "Start remote desktop connection";
 			toolstripMenuItem.Click += new EventHandler(this.StartRemoteDesktopConnection);
@@ -38,11 +36,14 @@ namespace Keemote
 
 		private void StartRemoteDesktopConnection(object sender, EventArgs e)
 		{
-			PwEntry entry = m_host.MainWindow.GetSelectedEntry(false);
+			//Retrieve selected entry in order to get values
+			PwEntry entry = pluginHost.MainWindow.GetSelectedEntry(false);
 			ProtectedString protectedUsername = entry.Strings.Get("UserName");
 			ProtectedString protectedPassword = entry.Strings.Get("Password");
 			ProtectedString protectedUrl = entry.Strings.Get("URL");
 
+			// TODO: Remove credentials from cmdkey after a period of time
+			// Run cmdkey in order to 'temporarily' save credentials which mstsc can use
 			Process cmdKeyProcess = new Process();
 			cmdKeyProcess.StartInfo.FileName = "cmdkey.exe";
 			cmdKeyProcess.StartInfo.Arguments = $"/generic:TERMSRV/{protectedUrl.ReadString()} /user:{protectedUsername.ReadString()} /pass:{protectedPassword.ReadString()}";
