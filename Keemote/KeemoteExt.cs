@@ -72,7 +72,7 @@ namespace Keemote
 			// Run cmdkey in order to 'temporarily' save credentials which mstsc can use
 			Process cmdKeyProcess = new Process();
 			cmdKeyProcess.StartInfo.FileName = "cmdkey.exe";
-			cmdKeyProcess.StartInfo.Arguments = $"/generic:TERMSRV/{protectedUrl.ReadString()} /user:{protectedUsername.ReadString()} /pass:{protectedPassword.ReadString()}";
+			cmdKeyProcess.StartInfo.Arguments = $"/generic:TERMSRV/{protectedUrl.ReadString()} /user:\"{protectedUsername.ReadString()}\" /pass:\"{protectedPassword.ReadString()}\"";
 			cmdKeyProcess.Start();
 
 			Process remoteDesktopProcess = new Process();
